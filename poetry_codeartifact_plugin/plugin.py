@@ -6,7 +6,11 @@ import boto3
 from botocore.exceptions import BotoCoreError
 from cleo.io.io import IO
 from poetry.config.config import Config
-from poetry.exceptions import PoetryException
+
+try:
+    from poetry.exceptions import PoetryError
+except ImportError:
+    from poetry.exceptions import PoetryException as PoetryError  # type: ignore
 from poetry.plugins import Plugin
 from poetry.poetry import Poetry
 from poetry.utils.authenticator import Authenticator
@@ -42,7 +46,7 @@ def monkeypatch_authenticator(io: IO):
                             domainOwner=domain_owner,
                         )
                     except BotoCoreError as err:
-                        raise PoetryException(
+                        raise PoetryError(
                             f"Failed to get a new CodeArtifact authorization token: {err}\n\n-> Are your local AWS credentials up-to-date?"
                         )
                     self._password_manager.set_http_password(
